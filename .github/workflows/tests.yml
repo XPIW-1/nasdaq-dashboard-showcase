@@ -1,5 +1,7 @@
 name: Tests
 
+# 每次 push 或开 PR 时自动跑一遍 tests/ 里的测试，
+# 防止改代码时不小心把评分、加仓或推送逻辑改坏。
 on:
   push:
     branches: [main]
