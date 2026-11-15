@@ -1,5 +1,7 @@
 # Nasdaq-100 定投决策仪表盘
 
+[![Tests](https://github.com/XPIW-1/nasdaq-dashboard-showcase/actions/workflows/tests.yml/badge.svg)](https://github.com/XPIW-1/nasdaq-dashboard-showcase/actions/workflows/tests.yml)
+
 > 公开展示版：基金、金额和弹药额度都是示例数值，规则与代码和实际使用的版本一致。
 
 ![仪表盘首屏：今日倍数与理由、今日加仓、回撤档位尺（示例配置）](docs/screenshot.png)
@@ -23,7 +25,7 @@
 - 前端：Streamlit，核心面板用自绘 HTML/CSS（"精密仪器"设计规范，见 `DESIGN.md`），图表用 ECharts，手机优先。
 - 存储：Supabase（可选），未配置时回退到本地 CSV / JSON。
 - 推送：GitHub Actions + Server酱，按 A 股交易日历每天推送微信消息；同一天不重复发送，数据异常时只发警告。
-- 测试：pytest，约 215 个测试，覆盖倍数规则、数据降级、资金分配、推送内容和访问口令。
+- 测试：pytest，约 215 个测试，覆盖倍数规则、数据降级、资金分配、推送内容和访问口令；每次推送由 GitHub Actions 自动运行（`.github/workflows/tests.yml`）。
 
 ## 项目用途
 
