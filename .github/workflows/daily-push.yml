@@ -1,0 +1,50 @@
+name: Daily push
+
+# Public showcase copy: the schedule is removed because this repository has no
+# Secrets (Server酱 SendKey, Supabase). To run it for real, add the Secrets and
+# a schedule such as `- cron: "30 0 * * 1-5"` (08:30 Beijing, Monday-Friday).
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only print the message (send nothing, save nothing)"
+        type: boolean
+        default: true
+      force:
+        description: "Send even on a non-trading day or if already sent today"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-push
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-push.txt
+      - name: Install dependencies
+        run: pip install -r requirements-push.txt
+      - name: Send daily push
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          DASHBOARD_URL: ${{ vars.DASHBOARD_URL }}
+        run: |
+          args=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            [ "${{ inputs.dry_run }}" = "true" ] && args="$args --dry-run"
+            [ "${{ inputs.force }}" = "true" ] && args="$args --force"
+          fi
+          python -m push.daily_push $args

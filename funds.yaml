@@ -1,0 +1,79 @@
+# 定投基金与弹药配置（示例数值）
+#
+# 这是公开展示用的示例配置：基金名、代码、平台和金额都是虚构的。
+# 部署自己的版本时，把它换成你自己的基金和金额即可。
+#
+# 自动定投：每只基金每天固定扣款 daily 元，不随倍数变化（合计就是 1.00× 的基数）。
+# 每日手动加仓 = 基数 × (倍数 − 1)，四舍五入到整数元，按 topup_priority 从小到大
+# 填进可加仓的基金，每只不超过"单日上限 cap − 自动定投 daily"。
+#
+# 基金字段：
+#   name / code / platform   显示用
+#   daily            自动定投每日金额（元）；暂停的基金填 0
+#   cap              单日申购上限（元）；null 表示没有上限
+#   paused           暂停定投时为 true
+#   topup_priority   参与每日手动加仓的顺序（数字小的先填）；不参与就不写
+#   manual_only      只用于"进入新档位额外补一次"
+#
+# 改完提交到 GitHub，页面重新部署后生效。
+
+plan:
+  trading_days_per_month: 21
+
+funds:
+  - name: 示例纳指基金 A
+    code: "DEMO-A"
+    platform: 示例平台 1
+    daily: 60
+    cap: 150
+
+  - name: 示例纳指基金 B
+    code: "DEMO-B"
+    platform: 示例平台 2
+    daily: 30
+    cap: 300
+    topup_priority: 1
+
+  - name: 示例港股基金 C
+    code: "DEMO-C"
+    platform: 示例平台 1
+    daily: 10
+    cap: null
+
+  - name: 示例科技基金 D
+    code: "DEMO-D"
+    platform: 示例平台 1
+    daily: 0
+    cap: 150
+    paused: true
+    manual_only: true
+
+  - name: 示例纳指基金 E
+    code: "DEMO-E"
+    platform: 示例平台 1
+    daily: 0
+    cap: 20
+    paused: true
+
+# 加仓弹药：只有手动加仓动用弹药，自动定投不动用。
+# 余额和各区已用额度在页面上填写；每个交易日推送后，当天的加仓金额会自动记入。
+# 某个区的额度用完后按 1.00× 执行（不再加仓），直到回撤进入下一个区。
+ammo:
+  name: 加仓弹药
+  total: 10000
+  zones:
+    - key: z1
+      label: 一区
+      from_dd: -0.08       # 回撤到 -8% 起
+      to_dd: -0.25
+      budget: 3000
+    - key: z2
+      label: 二区
+      from_dd: -0.25
+      to_dd: -0.35
+      budget: 4000
+    - key: z3
+      label: 保留区
+      from_dd: -0.35
+      to_dd: null          # 无下限
+      budget: 3000
